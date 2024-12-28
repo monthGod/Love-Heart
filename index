@@ -1,0 +1,349 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Love-Heart</title>
+  <style>
+    html,
+    body {
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      background: #000;
+    }
+
+    canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .wenzi {
+      text-align: center;
+      color: #ea80b0;
+      margin-top: 30px;
+      position: absolute;
+      z-index: 100;
+      width: 100%;
+      top: 100px;
+      text-shadow: 0 0 10px rgba(234, 128, 176, 0.5),
+        0 0 20px rgba(234, 128, 176, 0.5),
+        0 0 30px rgba(234, 128, 176, 0.5),
+        0 0 40px rgba(234, 128, 176, 0.5);
+      font-size: 24px;
+    }
+    .aini{
+      color: #fff;
+      width: 100%;
+      height: calc(100% - 80px);
+      display: flex;
+      font-size: 46px;
+      position: absolute;
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      /* padding-top: 100%; */
+      text-shadow: 0 0 10px rgba(234, 128, 176, 0.5),
+        0 0 20px rgba(234, 128, 176, 0.5),
+        0 0 30px rgba(234, 128, 176, 0.5),
+        0 0 40px rgba(234, 128, 176, 0.5);
+        text-align: center;
+        flex-direction: column;
+        line-height: 70px;
+    
+    }
+    .aini p{
+      padding: 0;
+      margin: 0;
+    }
+    .img-my-gr{
+      position: absolute;
+      z-index: 1;
+      width: 100%;
+      height: calc(100% - 0px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0.6;
+      /* left: 25%; */
+    }
+    .img-my-gr img{
+      width: 48%;
+    }
+    #pinkboard{
+      z-index: 12;
+    }
+    #myAudio {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <audio id="myAudio" src="./遇见你.mp3" style="display: none;"></audio>
+  <p class="wenzi">
+    “浪漫就是花时间慢慢吃饭，花时间慢慢喝茶。花时间慢慢走，花时间慢慢变老。”</br></br>
+    我想这些浪漫是对人生而言的吧。对爱情来说，最浪漫的事情莫过于:</br></br>
+    和喜欢的人一起，从一日三餐到白发苍苍。</br></br>
+    在一蔬一饭中携手共度余生。</br></br>
+    一生所求，不过温暖与良人。</br></br>
+    一生最重，不过饱餐与被爱。</br></br>
+    你我都是普通人，可以不关心宇宙不关心人类，只要关心粮食蔬菜和心上人，就够了。</br></br>
+    去见你的路上，风是暖的，雨是甜的，连云朵都是棉花糖的样子。</br></br>
+    嘴角边情话是你，心里所念所想是你，眼中星辰也是你，余生所爱都是你。
+  </p>
+  <div class="aini" id="playButton">
+    <p style="font-size: 36px;">小点点</p>
+    <p>遇见你，真的很开心</p>
+    <p>无论怎么样，都想和你在一起</p>
+  </div>
+  <div class="img-my-gr"><img src="./1-1.png" alt=""></div>
+  <canvas id="canvas"></canvas>
+  <canvas id="pinkboard"></canvas>
+  <script>
+    let isBofan = false;
+    const audio = document.getElementById('myAudio');
+    const playButton = document.getElementById('playButton');
+      // 添加点击事件监听器
+    playButton.addEventListener('click', function() {
+        // 播放音频
+        if(!isBofan){
+          isBofan = true;
+          audio.play().catch(error => {
+              console.error('无法播放音频:', error);
+          });
+        }else{
+            isBofan = false;
+           // 暂停音频并重置到开头
+            audio.pause();
+            audio.currentTime = 0;
+        }
+    });
+
+    var settings = {
+      particles: {
+        length: 500,
+        duration: 2,
+        velocity: 100,
+        effect: -0.75,
+        size: 32,
+      },
+    };
+    (function () { var b = 0; var c = ["ms", "moz", "webkit", "o"]; for (var a = 0; a < c.length && !window.requestAnimationFrame; ++a) { window.requestAnimationFrame = window[c[a] + "RequestAnimationFrame"]; window.cancelAnimationFrame = window[c[a] + "CancelAnimationFrame"] || window[c[a] + "CancelRequestAnimationFrame"] } if (!window.requestAnimationFrame) { window.requestAnimationFrame = function (h, e) { var d = new Date().getTime(); var f = Math.max(0, 16 - (d - b)); var g = window.setTimeout(function () { h(d + f) }, f); b = d + f; return g } } if (!window.cancelAnimationFrame) { window.cancelAnimationFrame = function (d) { clearTimeout(d) } } }());
+
+    var Point = (function () {
+      function Point(x, y) {
+        this.x = (typeof x !== 'undefined') ? x : 0;
+        this.y = (typeof y !== 'undefined') ? y : 0;
+      }
+      Point.prototype.clone = function () {
+        return new Point(this.x, this.y);
+      };
+      Point.prototype.length = function (length) {
+        if (typeof length == 'undefined')
+          return Math.sqrt(this.x * this.x + this.y * this.y);
+        this.normalize();
+        this.x *= length;
+        this.y *= length;
+        return this;
+      };
+      Point.prototype.normalize = function () {
+        var length = this.length();
+        this.x /= length;
+        this.y /= length;
+        return this;
+      };
+      return Point;
+    })();
+    var Particle = (function () {
+      function Particle() {
+        this.position = new Point();
+        this.velocity = new Point();
+        this.acceleration = new Point();
+        this.age = 0;
+      }
+      Particle.prototype.initialize = function (x, y, dx, dy) {
+        this.position.x = x;
+        this.position.y = y;
+        this.velocity.x = dx;
+        this.velocity.y = dy;
+        this.acceleration.x = dx * settings.particles.effect;
+        this.acceleration.y = dy * settings.particles.effect;
+        this.age = 0;
+      };
+      Particle.prototype.update = function (deltaTime) {
+        this.position.x += this.velocity.x * deltaTime;
+        this.position.y += this.velocity.y * deltaTime;
+        this.velocity.x += this.acceleration.x * deltaTime;
+        this.velocity.y += this.acceleration.y * deltaTime;
+        this.age += deltaTime;
+      };
+      Particle.prototype.draw = function (context, image) {
+        function ease(t) {
+          return (--t) * t * t + 1;
+        }
+        var size = image.width * ease(this.age / settings.particles.duration);
+        context.globalAlpha = 1 - this.age / settings.particles.duration;
+        context.drawImage(image, this.position.x - size / 2, this.position.y - size / 2, size, size);
+      };
+      return Particle;
+    })();
+    var ParticlePool = (function () {
+      var particles,
+        firstActive = 0,
+        firstFree = 0,
+        duration = settings.particles.duration;
+      function ParticlePool(length) {
+        // create and populate particle pool
+        particles = new Array(length);
+        for (var i = 0; i < particles.length; i++)
+          particles[i] = new Particle();
+      }
+      ParticlePool.prototype.add = function (x, y, dx, dy) {
+        particles[firstFree].initialize(x, y, dx, dy);
+        // handle circular queue
+        firstFree++;
+        if (firstFree == particles.length) firstFree = 0;
+        if (firstActive == firstFree) firstActive++;
+        if (firstActive == particles.length) firstActive = 0;
+      };
+      ParticlePool.prototype.update = function (deltaTime) {
+        var i;
+        // update active particles
+        if (firstActive < firstFree) {
+          for (i = firstActive; i < firstFree; i++)
+            particles[i].update(deltaTime);
+        }
+        if (firstFree < firstActive) {
+          for (i = firstActive; i < particles.length; i++)
+            particles[i].update(deltaTime);
+          for (i = 0; i < firstFree; i++)
+            particles[i].update(deltaTime);
+        }
+        // remove inactive particles
+        while (particles[firstActive].age >= duration && firstActive != firstFree) {
+          firstActive++;
+          if (firstActive == particles.length) firstActive = 0;
+        }
+      };
+      ParticlePool.prototype.draw = function (context, image) {
+        // draw active particles
+        if (firstActive < firstFree) {
+          for (i = firstActive; i < firstFree; i++)
+            particles[i].draw(context, image);
+        }
+        if (firstFree < firstActive) {
+          for (i = firstActive; i < particles.length; i++)
+            particles[i].draw(context, image);
+          for (i = 0; i < firstFree; i++)
+            particles[i].draw(context, image);
+        }
+      };
+      return ParticlePool;
+    })();
+    (function (canvas) {
+      var context = canvas.getContext('2d'),
+        particles = new ParticlePool(settings.particles.length),
+        particleRate = settings.particles.length / settings.particles.duration, // particles/sec
+        time;
+      // get point on heart with -PI <= t <= PI
+      function pointOnHeart(t) {
+        return new Point(
+          160 * Math.pow(Math.sin(t), 3),
+          130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t) + 25
+        );
+      }
+      // creating the particle image using a dummy canvas
+      var image = (function () {
+        var canvas = document.createElement('canvas'),
+          context = canvas.getContext('2d');
+        canvas.width = settings.particles.size;
+        canvas.height = settings.particles.size;
+        // helper function to create the path
+        function to(t) {
+          var point = pointOnHeart(t);
+          point.x = settings.particles.size / 2 + point.x * settings.particles.size / 350;
+          point.y = settings.particles.size / 2 - point.y * settings.particles.size / 350;
+          return point;
+        }
+        // create the path
+        context.beginPath();
+        var t = -Math.PI;
+        var point = to(t);
+        context.moveTo(point.x, point.y);
+        while (t < Math.PI) {
+          t += 0.01; // baby steps!
+          point = to(t);
+          context.lineTo(point.x, point.y);
+        }
+        context.closePath();
+        // create the fill
+        context.fillStyle = '#EA80B0';
+        context.fill();
+        // create the image
+        var image = new Image();
+        image.src = canvas.toDataURL();
+        return image;
+      })();
+      // render that thing!
+      function render() {
+        // next animation frame
+        requestAnimationFrame(render);
+        // update time
+        var newTime = new Date().getTime() / 1000,
+          deltaTime = newTime - (time || newTime);
+        time = newTime;
+        // clear canvas
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        // create new particles
+        var amount = particleRate * deltaTime;
+        for (var i = 0; i < amount; i++) {
+          var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
+          var dir = pos.clone().length(settings.particles.velocity);
+          particles.add(canvas.width / 2 + pos.x, canvas.height / 2 - pos.y, dir.x, -dir.y);
+        }
+        // update and draw particles
+        particles.update(deltaTime);
+        particles.draw(context, image);
+      }
+      // handle (re-)sizing of the canvas
+      function onResize() {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+      }
+      window.onresize = onResize;
+      // delay rendering bootstrap
+      setTimeout(function () {
+        onResize();
+        render();
+      }, 10);
+    })(document.getElementById('pinkboard'));
+  </script>
+  <script>
+    let canvas = document.getElementById('canvas');
+    let ctx = canvas.getContext('2d');
+    // screen.availWidth:可视区域的宽度
+    canvas.width = screen.availWidth;
+    canvas.height = screen.availHeight;
+
+    let str = 'I LOVE YOU 小点点'.split('');
+    const px = 20;
+    let arr = Array(Math.ceil(canvas.width / px)).fill(0)
+    const rain = () => {
+      ctx.fontSize = '9px';
+      //使用,0.05模糊，每次都重叠绘制。看出虚幻的效果
+      ctx.fillStyle = 'rgba(0,0,0,0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#EA80B0';
+      arr = arr.map((ele, index) => {
+        //横向间隔px的距离显示字母
+        ctx.fillText(str[Math.floor(Math.random() * str.length)], index * px, ele + 18 + px);
+        //修改纵向坐标
+        return (ele > canvas.height + 1000 || ele > 5000 * Math.random()) ? 0 : ele + 18
+      });
+    }
+    setInterval(rain,50)
+  </script>
+</body>
+
+</html>
