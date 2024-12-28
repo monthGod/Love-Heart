@@ -37,7 +37,7 @@
       width: 100%;
       height: calc(100% - 80px);
       display: flex;
-      font-size: 46px;
+      font-size: 34px;
       position: absolute;
       z-index: 1000;
       justify-content: center;
@@ -92,7 +92,7 @@
     去见你的路上，风是暖的，雨是甜的，连云朵都是棉花糖的样子。</br></br>
     嘴角边情话是你，心里所念所想是你，眼中星辰也是你，余生所爱都是你。
   </p>
-  <div class="aini" id="playButton">
+  <div class="aini" id="playButton" loop>
     <p style="font-size: 36px;">小点点</p>
     <p>遇见你，真的很开心</p>
     <p>无论怎么样，都想和你在一起</p>
@@ -118,6 +118,13 @@
             audio.pause();
             audio.currentTime = 0;
         }
+    });
+    // 可选：监听音频结束事件，确保循环播放
+    audio.addEventListener('ended', function() {
+        // 如果需要在每次播放结束时执行某些操作，可以在这里添加代码
+        console.log('音频播放结束，即将重新开始...');
+        audio.play()
+        // 由于已经设置了 loop 属性，这里不需要手动调用 play()
     });
 
     var settings = {
@@ -337,9 +344,9 @@
       ctx.fillStyle = '#EA80B0';
       arr = arr.map((ele, index) => {
         //横向间隔px的距离显示字母
-        ctx.fillText(str[Math.floor(Math.random() * str.length)], index * px, ele + 18 + px);
+        ctx.fillText(str[Math.floor(Math.random() * str.length)], index * px, ele + 10 + px);
         //修改纵向坐标
-        return (ele > canvas.height + 1000 || ele > 5000 * Math.random()) ? 0 : ele + 18
+        return (ele > canvas.height + 1000 || ele > 5000 * Math.random()) ? 0 : ele + 12
       });
     }
     setInterval(rain,50)
